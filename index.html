@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Dashboard | Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1000px;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            min-height: 600px;
+        }
+
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            color: white;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            top: -150px;
+            right: -100px;
+        }
+
+        .left-panel::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            bottom: -80px;
+            left: -80px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo i {
+            font-size: 32px;
+            margin-right: 12px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .panel-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .panel-content h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .panel-content p {
+            font-size: 16px;
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .team-count {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .team-count i {
+            font-size: 24px;
+            margin-right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .team-count div h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .team-count div p {
+            margin: 0;
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .features {
+            list-style: none;
+            margin-top: 25px;
+        }
+
+        .features li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        .features i {
+            margin-right: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .right-panel {
+            flex: 1;
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-header h2 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #444;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+
+        .input-with-icon input {
+            width: 100%;
+            padding: 15px 15px 15px 48px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .input-with-icon input:focus {
+            outline: none;
+            border-color: #4361ee;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+
+        .remember-me input {
+            margin-right: 8px;
+        }
+
+        .forgot-password {
+            color: #4361ee;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        .login-btn {
+            background: linear-gradient(to right, #4361ee, #3a0ca3);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .signup-link {
+            text-align: center;
+            font-size: 15px;
+            color: #666;
+        }
+
+        .signup-link a {
+            color: #4361ee;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #e63946;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+        }
+
+        .success-message i {
+            margin-right: 8px;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: none;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .login-btn .btn-text {
+            display: block;
+        }
+
+        .login-btn .spinner {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .admin-info {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed #ddd;
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+        }
+
+        .admin-info a {
+            color: #4361ee;
+            text-decoration: none;
+        }
+
+        /* Admin Panel Styling */
+        .admin-panel {
+            display: none;
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .admin-panel h3 {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .admin-panel h3 i {
+            margin-right: 10px;
+        }
+
+        .user-credentials {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            border-left: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .user-email {
+            font-weight: 500;
+        }
+
+        .user-password {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .admin-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .admin-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-left: 8px;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .copy-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1000;
+        }
+
+        /* Copyright Footer */
+        .copyright-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px 20px;
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+            border-top: 1px solid #eaeaea;
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .copyright-footer a {
+            color: #4361ee;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+
+        .copyright-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .copyright-footer .separator {
+            margin: 0 10px;
+            color: #ccc;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                max-width: 500px;
+                margin-bottom: 60px;
+            }
+
+            .left-panel {
+                padding: 40px 30px;
+            }
+
+            .right-panel {
+                padding: 40px 30px;
+            }
+
+            .admin-toggle {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 20px;
+                width: 100%;
+            }
+
+            .copyright-footer {
+                font-size: 12px;
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Login Page -->
+    <div class="container" id="loginContainer">
+        <button class="admin-toggle" id="adminToggle">
+            <i class="fas fa-user-shield"></i> Admin Mode
+        </button>
+
+        <div class="left-panel">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <h1>Berkeley Task Dashboard</h1>
+            </div>
+            <div class="panel-content">
+                <h2>Secure Login</h2>
+                <p>Authorized team members only. Use your assigned credentials to access the project dashboard.</p>
+
+                <div class="team-count">
+                    <i class="fas fa-users"></i>
+                    <div>
+                        <h3>7 Authorized Users</h3>
+                        <p>Access restricted to team members only</p>
+                    </div>
+                </div>
+
+                <!-- Admin Panel - Hidden by default -->
+                <div class="admin-panel" id="adminPanel">
+                    <h3><i class="fas fa-key"></i> Team Credentials (Admin View)</h3>
+                    <div class="user-credentials" id="usersList">
+                        <!-- Users will be populated by JavaScript when admin mode is enabled -->
+                    </div>
+                    <p style="font-size: 12px; margin-top: 10px; opacity: 0.8;">
+                        <i class="fas fa-info-circle"></i> These credentials are hidden from regular users
+                    </p>
+                </div>
+
+                <ul class="features">
+                    <li><i class="fas fa-check-circle"></i> Secure authentication system</li>
+                    <li><i class="fas fa-check-circle"></i> 7 authorized team members only</li>
+                    <li><i class="fas fa-check-circle"></i> Redirects to project dashboard</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="login-header">
+                <h2>Team Member Login</h2>
+                <p>Enter your credentials to access the dashboard</p>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i> Login successful! Redirecting to dashboard...
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Team Member Email</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" placeholder="Enter your team email" required>
+                    </div>
+                    <div class="error-message" id="emailError">Please enter a valid email address</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="Enter your password" required>
+                    </div>
+                    <div class="error-message" id="passwordError">Password must be at least 6 characters</div>
+                </div>
+
+                <div class="remember-forgot">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember">
+                        <label for="remember">Remember me on this device</label>
+                    </div>
+                    <a href="#" class="forgot-password" id="forgotPassword">Reset password</a>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginButton">
+                    <span class="btn-text">Access Dashboard</span>
+                    <div class="spinner" id="loginSpinner"></div>
+                </button>
+            </form>
+
+            <div class="signup-link">
+                New team member? <a href="#" id="requestAccess">Request access</a>
+            </div>
+
+            <div class="admin-info">
+                <p></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Copy Notification -->
+    <div class="copy-notification" id="copyNotification">
+        <i class="fas fa-check"></i> Credentials copied to clipboard!
+    </div>
+
+    <!-- Copyright Footer -->
+    <div class="copyright-footer">
+        <div>
+            © 2025 Santam & Berkeley Services UAE LLC. All Rights Reserved.
+            <span class="separator">|</span>
+            <a href="mailto:santam.sharma@berkeleyuae.com">Contact Admin</a>
+            <span class="separator">|</span>
+            <a href="#" id="privacyPolicy">Privacy Policy</a>
+            <span class="separator">|</span>
+            <a href="#" id="termsOfService">Terms of Service</a>
+        </div>
+        <div style="margin-top: 5px; font-size: 11px; color: #888;">
+            <i class="fas fa-lock"></i> This is a secure system. Unauthorized access is prohibited.
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const loginForm = document.getElementById('loginForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            const successMessage = document.getElementById('successMessage');
+            const loginButton = document.getElementById('loginButton');
+            const btnText = document.querySelector('.btn-text');
+            const loginSpinner = document.getElementById('loginSpinner');
+            const adminPanel = document.getElementById('adminPanel');
+            const adminToggle = document.getElementById('adminToggle');
+            const usersList = document.getElementById('usersList');
+            const copyNotification = document.getElementById('copyNotification');
+            const requestAccessLink = document.getElementById('requestAccess');
+            const forgotPasswordLink = document.getElementById('forgotPassword');
+            const privacyPolicyLink = document.getElementById('privacyPolicy');
+            const termsOfServiceLink = document.getElementById('termsOfService');
+
+            // Your GitHub Pages redirect URL (Modified for Local Testing)
+            const redirectUrl = "/test8.html";
+
+            // 7 Authorized users with their credentials (hidden from regular users)
+            const authorizedUsers = [
+                { id: 1, email: "admin@berkeleyuae.com", password: "Santam@123", name: "Developer" },
+                { id: 2, email: "sec@berkeleyuae.com", password: "sec@123", name: "Security Division" },
+                { id: 3, email: "mep@berkeleyuae.com", password: "mep@123", name: "Maintenance Division" },
+                { id: 4, email: "lsd@berkeleyuae.com", password: "lsd@123", name: "Landscaping Division" },
+                { id: 5, email: "cln@berkeleyuae.com", password: "cln@123", name: "Cleaning Division" },
+                { id: 6, email: "lau@berkeleyuae.com", password: "lau@123", name: "Laundry Division" },
+                { id: 7, email: "fm@berkeleyuae.com", password: "fm@123", name: "FM Divsion" }
+            ];
+
+            // Admin password to view credentials
+            const adminPassword = "admin123";
+            let adminModeActive = false;
+
+            // Display the authorized users in admin panel
+            function displayAuthorizedUsers() {
+                usersList.innerHTML = '';
+
+                authorizedUsers.forEach(user => {
+                    const userItem = document.createElement('div');
+                    userItem.className = 'user-item';
+                    userItem.innerHTML = `
+                        <div>
+                            <div class="user-email">${user.email}</div>
+                            <div style="font-size: 11px; opacity: 0.8;">${user.name}</div>
+                        </div>
+                        <div>
+                            <span class="user-password">${user.password}</span>
+                            <button class="copy-btn" data-email="${user.email}" data-password="${user.password}">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                    `;
+                    usersList.appendChild(userItem);
+                });
+
+                // Add copy functionality
+                document.querySelectorAll('.copy-btn').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const email = this.getAttribute('data-email');
+                        const password = this.getAttribute('data-password');
+                        const textToCopy = `Email: ${email}\nPassword: ${password}`;
+
+                        navigator.clipboard.writeText(textToCopy).then(() => {
+                            // Show notification
+                            copyNotification.style.display = 'block';
+                            setTimeout(() => {
+                                copyNotification.style.display = 'none';
+                            }, 2000);
+                        });
+                    });
+                });
+            }
+
+            // Toggle admin panel
+            adminToggle.addEventListener('click', function () {
+                if (!adminModeActive) {
+                    // Prompt for admin password
+                    const password = prompt("Enter admin password to view credentials:");
+                    if (password === adminPassword) {
+                        adminModeActive = true;
+                        adminPanel.style.display = 'block';
+                        adminToggle.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Credentials';
+                        displayAuthorizedUsers();
+                    } else if (password !== null) {
+                        alert("Incorrect admin password!");
+                    }
+                } else {
+                    // Hide admin panel
+                    adminModeActive = false;
+                    adminPanel.style.display = 'none';
+                    adminToggle.innerHTML = '<i class="fas fa-user-shield"></i> Admin Mode';
+                }
+            });
+
+            // Manual validation function
+            function validateCredentials(email, password) {
+                // Check if the email and password match any authorized user
+                for (let i = 0; i < authorizedUsers.length; i++) {
+                    if (email === authorizedUsers[i].email && password === authorizedUsers[i].password) {
+                        return {
+                            isValid: true,
+                            user: authorizedUsers[i]
+                        };
+                    }
+                }
+
+                return { isValid: false, user: null };
+            }
+
+            // Form validation
+            emailInput.addEventListener('input', function () {
+                if (emailInput.validity.valid) {
+                    emailError.style.display = 'none';
+                }
+            });
+
+            passwordInput.addEventListener('input', function () {
+                if (passwordInput.value.length >= 6) {
+                    passwordError.style.display = 'none';
+                }
+            });
+
+            // Form submission
+            loginForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                let isValid = true;
+
+                // Validate email format
+                if (!emailInput.validity.valid || emailInput.value === '') {
+                    emailError.textContent = 'Please enter a valid email address';
+                    emailError.style.display = 'block';
+                    isValid = false;
+                } else {
+                    emailError.style.display = 'none';
+                }
+
+                // Validate password length
+                if (passwordInput.value.length < 6) {
+                    passwordError.textContent = 'Password must be at least 6 characters';
+                    passwordError.style.display = 'block';
+                    isValid = false;
+                } else {
+                    passwordError.style.display = 'none';
+                }
+
+                if (isValid) {
+                    // Show loading state
+                    loginButton.disabled = true;
+                    btnText.style.display = 'none';
+                    loginSpinner.style.display = 'block';
+
+                    // Get input values
+                    const email = emailInput.value.trim();
+                    const password = passwordInput.value;
+
+                    // API Call to Backend
+                    fetch('/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, password })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Login Success
+                                loginSpinner.style.display = 'none';
+                                loginButton.style.backgroundColor = '#28a745';
+                                loginButton.innerHTML = '<i class="fas fa-check"></i> Success';
+
+                                successMessage.style.display = 'flex';
+                                successMessage.innerHTML = `<i class="fas fa-check-circle"></i> Welcome ${data.user.name}! Redirecting...`;
+
+                                // Save user info and token
+                                localStorage.setItem('authToken', data.token);
+                                localStorage.setItem('user', JSON.stringify(data.user));
+
+                                setTimeout(function () {
+                                    window.location.href = redirectUrl;
+                                }, 1500);
+                            } else {
+                                // Login Failed
+                                resetLoginButton();
+
+                                // Show error
+                                emailError.textContent = data.message || 'Invalid credentials';
+                                emailError.style.display = 'block';
+                                passwordError.style.display = 'none';
+
+                                console.log(`Failed login attempt: ${email}`);
+                            }
+                        })
+                        .catch(error => {
+                            resetLoginButton();
+                            emailError.textContent = 'Connection error. Is backend running?';
+                            emailError.style.display = 'block';
+                            console.error('Error:', error);
+                        });
+                } else {
+                    resetLoginButton();
+                }
+            });
+
+            // Function to reset login button state
+            function resetLoginButton() {
+                loginButton.disabled = false;
+                btnText.style.display = 'block';
+                loginSpinner.style.display = 'none';
+            }
+
+            // Request access link
+            requestAccessLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                alert('To request access to the dashboard, please contact the system administrator at:\n\nSantam Sharma\n\nInclude your full name, role, and reason for access.');
+            });
+
+            // Forgot password link
+            forgotPasswordLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                alert('For password reset, please contact the system administrator.\n\nEmail: santam.sharma@berkeleyuae.com\n\nYou will need to verify your identity before a password reset.');
+            });
+
+            // Privacy Policy link
+            privacyPolicyLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                alert('Privacy Policy:\n\n1. Your login credentials are securely stored and encrypted.\n2. We do not share your information with third parties.\n3. Activity logs are maintained for security purposes only.\n4. All data is protected in accordance with UAE data protection laws.');
+            });
+
+            // Terms of Service link
+            termsOfServiceLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                alert('Terms of Service:\n\n1. This system is for Santam Sharma and authorized Berkeley Services UAE LLC employees only.\n2. Unauthorized access is strictly prohibited.\n3. Users are responsible for maintaining the confidentiality of their credentials.\n4. All activities are logged and monitored for security purposes.\n5. Misuse of the system may result in disciplinary action.');
+            });
+
+            // Check if there's a remembered email
+            const rememberedEmail = localStorage.getItem('rememberedEmail');
+            if (rememberedEmail) {
+                emailInput.value = rememberedEmail;
+                document.getElementById('remember').checked = true;
+            }
+
+            // Console log for admin reference
+            console.log("==========================================");
+            console.log("ADMIN INFORMATION (Check console for credentials)");
+            console.log("==========================================");
+            console.log("Authorized Users:");
+            authorizedUsers.forEach(user => {
+                console.log(`${user.name}: ${user.email} / ${user.password}`);
+            });
+            console.log("Admin password to view credentials: admin123");
+            console.log("Redirect URL:", redirectUrl);
+            console.log("==========================================");
+
+            // Optional: Add a hint for admin (hidden in page source)
+            const adminHint = document.createElement('div');
+            adminHint.style.cssText = 'position: fixed; bottom: 10px; left: 10px; font-size: 10px; color: #ccc; z-index: 9999;';
+            adminHint.innerHTML = '<!-- Admin: Check console for credentials -->';
+            document.body.appendChild(adminHint);
+        });
+    </script>
+</body>
+
+</html>
