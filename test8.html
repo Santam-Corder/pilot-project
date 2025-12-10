@@ -2702,6 +2702,19 @@
                 showNotification("Error connecting to real-time database", "error");
             });
         }
+
+        // Make functions globally available for HTML onclick handlers
+        window.updateTaskStatus = updateTaskStatus;
+        window.openDeclineModal = openDeclineModal;
+        window.closeDeclineModal = closeDeclineModal;
+        window.confirmDecline = confirmDecline;
+        window.addNewTask = addNewTask;
+        window.loadSampleTasks = loadSampleTasks;
+        window.clearAllTasks = clearAllTasks;
+        // Check if generateSummaryReport is defined before assigning, as it might be named differently
+        if (typeof generateSummaryReport !== 'undefined') window.generateSummaryReport = generateSummaryReport;
+        if (typeof downloadExcelReport !== 'undefined') window.downloadExcelReport = downloadExcelReport;
+        if (typeof previewReport !== 'undefined') window.previewReport = previewReport;
     </script>
 </body>
 
