@@ -660,7 +660,10 @@
             const termsOfServiceLink = document.getElementById('termsOfService');
 
             // Your GitHub Pages redirect URL (Relative path for project pages)
-            const redirectUrl = "test8.html";
+            // Dynamic redirect to handle GitHub Pages subfolders correctly
+            const path = window.location.pathname;
+            const basePath = path.substring(0, path.lastIndexOf('/') + 1);
+            const redirectUrl = basePath + "test8.html";
 
             // 7 Authorized users with their credentials (hidden from regular users)
             const authorizedUsers = [
