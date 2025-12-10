@@ -800,50 +800,38 @@
                     const email = emailInput.value.trim();
                     const password = passwordInput.value;
 
-                    // API Call to Backend
-                    fetch('/api/login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ email, password })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                // Login Success
-                                loginSpinner.style.display = 'none';
-                                loginButton.style.backgroundColor = '#28a745';
-                                loginButton.innerHTML = '<i class="fas fa-check"></i> Success';
+                    // Simulate network delay for realism
+                    setTimeout(() => {
+                        const result = validateCredentials(email, password);
 
-                                successMessage.style.display = 'flex';
-                                successMessage.innerHTML = `<i class="fas fa-check-circle"></i> Welcome ${data.user.name}! Redirecting...`;
+                        if (result.isValid) {
+                            // Login Success
+                            loginSpinner.style.display = 'none';
+                            loginButton.style.backgroundColor = '#28a745';
+                            loginButton.innerHTML = '<i class="fas fa-check"></i> Success';
 
-                                // Save user info and token
-                                localStorage.setItem('authToken', data.token);
-                                localStorage.setItem('user', JSON.stringify(data.user));
+                            successMessage.style.display = 'flex';
+                            successMessage.innerHTML = `<i class="fas fa-check-circle"></i> Welcome ${result.user.name}! Redirecting...`;
 
-                                setTimeout(function () {
-                                    window.location.href = redirectUrl;
-                                }, 1500);
-                            } else {
-                                // Login Failed
-                                resetLoginButton();
+                            // Save user info and token (dummy token for client-side)
+                            localStorage.setItem('authToken', 'client-side-auth-token-' + Date.now());
+                            localStorage.setItem('user', JSON.stringify(result.user));
 
-                                // Show error
-                                emailError.textContent = data.message || 'Invalid credentials';
-                                emailError.style.display = 'block';
-                                passwordError.style.display = 'none';
-
-                                console.log(`Failed login attempt: ${email}`);
-                            }
-                        })
-                        .catch(error => {
+                            setTimeout(function () {
+                                window.location.href = redirectUrl;
+                            }, 1500);
+                        } else {
+                            // Login Failed
                             resetLoginButton();
-                            emailError.textContent = 'Connection error. Is backend running?';
+
+                            // Show error
+                            emailError.textContent = 'Invalid email or password';
                             emailError.style.display = 'block';
-                            console.error('Error:', error);
-                        });
+                            passwordError.style.display = 'none';
+
+                            console.log(`Failed login attempt: ${email}`);
+                        }
+                    }, 800);
                 } else {
                     resetLoginButton();
                 }
