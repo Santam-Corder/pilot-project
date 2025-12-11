@@ -526,13 +526,18 @@
 
         // Task actions
         async function acceptTask(taskId) {
+            console.log('Accepting task:', taskId);
             try {
                 const taskRef = doc(db, "tasks", taskId);
+                console.log('Task ref created:', taskRef);
                 await updateDoc(taskRef, { status: 'accepted' });
+                console.log('Task updated successfully');
                 showNotification('Task accepted successfully!', 'success');
             } catch (error) {
                 console.error('Error accepting task:', error);
-                showNotification('Failed to accept task', 'error');
+                console.error('Error code:', error.code);
+                console.error('Error message:', error.message);
+                showNotification('Failed to accept task: ' + error.message, 'error');
             }
         }
 
