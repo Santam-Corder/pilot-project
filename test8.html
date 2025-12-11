@@ -1362,8 +1362,12 @@
         // All tasks are stored in one simple array
         let allTasks = [];
 
+        // Task status tracking for notifications
+        const taskStatusMap = new Map(); // taskId -> {status, dept, title}
+
         import { db } from './js/firebase-config.js';
         import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, setDoc, getDocs, writeBatch, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { notificationManager } from './js/notifications.js';
 
 
 
@@ -2679,7 +2683,45 @@
 
                 allTasks = [];
                 querySnapshot.forEach((doc) => {
-                    allTasks.push({ id: doc.id, ...doc.data() });
+                    const taskData = doc.data();
+                    const taskId = doc.id;
+
+                    allTasks.push({ id: taskId, ...taskData });
+
+                    // Check for status changes and send notifications
+                    const previousTask = taskStatusMap.get(taskId);
+
+                    if (previousTask && previousTask.status !== taskData.status) {
+                        // Status changed - send notification
+                        const deptName = departments[taskData.dept]?.name || taskData.dept;
+
+                        if (taskData.status === 'accepted') {
+                            notificationManager.showNotification(
+                                '✅ Task Accepted',
+                                `${deptName} accepted: ${taskData.title}`,
+                                'accept'
+                            );
+                        } else if (taskData.status === 'declined') {
+                            notificationManager.showNotification(
+                                '⚠️ Task Declined',
+                                `${deptName} declined: ${taskData.title}`,
+                                'decline'
+                            );
+                        } else if (taskData.status === 'completed') {
+                            notificationManager.showNotification(
+                                '🎉 Task Completed',
+                                `${deptName} completed: ${taskData.title}`,
+                                'complete'
+                            );
+                        }
+                    }
+
+                    // Update task status map
+                    taskStatusMap.set(taskId, {
+                        status: taskData.status,
+                        dept: taskData.dept,
+                        title: taskData.title
+                    });
                 });
 
                 // Update UI
