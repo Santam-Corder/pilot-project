@@ -430,6 +430,9 @@
         import { db } from './js/firebase-config.js';
         import { collection, query, where, onSnapshot, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // Import Notification Manager
+        import { notificationManager } from './js/notifications.js';
+
         // Check session
         const sessionData = sessionStorage.getItem('currentUser');
         if (!sessionData) {
@@ -450,6 +453,7 @@
         // Global variables
         let allTasks = [];
         let taskToDecline = null;
+        let previousTaskIds = new Set(); // Track task IDs to detect new assignments
 
         // Load tasks
         function loadTasks() {
@@ -461,14 +465,40 @@
                 document.getElementById('status-text').textContent = 'Live Connected';
                 document.getElementById('status-text').style.color = '#27ae60';
 
+                const currentTaskIds = new Set();
+                const newTasks = [];
+
                 allTasks = [];
                 querySnapshot.forEach((docSnap) => {
                     const taskData = docSnap.data();
+                    const firestoreId = docSnap.id;
+
+                    currentTaskIds.add(firestoreId);
+
                     allTasks.push({
-                        firestoreId: docSnap.id,  // Firestore document ID for updates
+                        firestoreId: firestoreId,  // Firestore document ID for updates
                         ...taskData                // All task data including custom 'id' field
                     });
+
+                    // Check if this is a new task assignment
+                    if (!previousTaskIds.has(firestoreId) && taskData.status === 'pending') {
+                        newTasks.push(taskData);
+                    }
                 });
+
+                // Show notifications for new task assignments (skip on first load)
+                if (previousTaskIds.size > 0 && newTasks.length > 0) {
+                    newTasks.forEach(task => {
+                        notificationManager.showNotification(
+                            '🔔 New Task Assigned',
+                            `${task.title} - Priority: ${task.priority.toUpperCase()}`,
+                            'assign'
+                        );
+                    });
+                }
+
+                // Update previous task IDs for next comparison
+                previousTaskIds = currentTaskIds;
 
                 renderTasks();
             }, (error) => {
