@@ -816,9 +816,17 @@
                             successMessage.style.display = 'flex';
                             successMessage.innerHTML = `<i class="fas fa-check-circle"></i> Welcome ${result.user.name}! Redirecting...`;
 
-                            // Save user info and token (dummy token for client-side)
-                            localStorage.setItem('authToken', 'client-side-auth-token-' + Date.now());
-                            localStorage.setItem('user', JSON.stringify(result.user));
+                            // Save user info in sessionStorage
+                            sessionStorage.setItem('currentUser', JSON.stringify(result.user));
+
+                            // Determine redirect URL based on user role
+                            let redirectUrl;
+                            if (result.user.role === 'admin') {
+                                redirectUrl = basePath + 'test8.html';
+                            } else {
+                                // Department user - redirect to their department page
+                                redirectUrl = basePath + result.user.dept + '.html';
+                            }
 
                             setTimeout(function () {
                                 window.location.href = redirectUrl;
