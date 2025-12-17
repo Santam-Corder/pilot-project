@@ -1061,9 +1061,24 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="config-hours"><i class="fas fa-clock"></i> Estimated Hours</label>
                         <input type="number" id="config-hours" class="form-control" min="1" value="4"
                             placeholder="Estimated hours">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="config-files"><i class="fas fa-paperclip"></i> Attach Files (Optional)</label>
+                        <input type="file" id="config-files" class="form-control" multiple
+                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
+                        <small style="color: var(--gray-color); display: block; margin-top: 5px;">Max 10MB per file.
+                            Allowed: PDF, Images, Word, Excel</small>
+                        <div id="file-preview-container"
+                            style="margin-top: 10px; display: flex; flex-direction: column; gap: 5px;"></div>
+                    </div>
+
+                    <div class="form-group" style="flex-direction: row; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="config-allow-dept-uploads" style="width: auto; margin-right: 5px;">
+                        <label for="config-allow-dept-uploads" style="margin-bottom: 0;">Allow department to upload
+                            response files</label>
                     </div>
 
                     <div class="config-actions">
@@ -1369,6 +1384,7 @@
         import { db } from './js/firebase-config.js';
         import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, setDoc, getDocs, writeBatch, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { notificationManager } from './js/notifications.js';
+        import { fileUploadManager } from './js/file-upload.js';
 
 
 
@@ -2088,6 +2104,8 @@
             const deadline = document.getElementById('config-deadline').value;
             const priority = document.getElementById('config-priority').value;
             const hours = parseInt(document.getElementById('config-hours').value) || 4;
+            const fileInput = document.getElementById('config-files');
+            const allowDeptUploads = document.getElementById('config-allow-dept-uploads').checked;
 
             // Validate inputs
             if (!title || !description || !deadline) {
@@ -2095,13 +2113,39 @@
                 return;
             }
 
+            // Show loading state
+            const addButton = document.getElementById('add-task');
+            const originalText = addButton.innerHTML;
+            addButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Task...';
+            addButton.disabled = true;
+
             // Create new task with department-specific ID
+            // Note: We create a doc ref first to get the ID for file storage path
+            const newDocRef = doc(collection(db, "tasks"));
+            const docId = newDocRef.id;
+
             const deptPrefix = getDeptPrefix(dept);
-            // Note: In real app, ID generation might need a transaction to be perfect, 
-            // but for this scale, client-side calc + Firestore ID is fine.
-            // We'll use Firestore Auto-ID for the doc, but keep the custom ID field.
             const taskNumber = allTasks.filter(t => t.dept === dept).length + 1;
             const taskId = `TASK-${deptPrefix}-${String(taskNumber).padStart(3, '0')}`;
+
+            // Handle file uploads
+            const attachments = [];
+            if (fileInput.files.length > 0) {
+                addButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Uploading ${fileInput.files.length} files...`;
+
+                try {
+                    for (const file of fileInput.files) {
+                        const attachment = await fileUploadManager.uploadFile(file, docId, 'admin', true);
+                        attachments.push(attachment);
+                    }
+                } catch (error) {
+                    console.error('File upload error:', error);
+                    showNotification('Error uploading files: ' + error.message, 'error');
+                    addButton.innerHTML = originalText;
+                    addButton.disabled = false;
+                    return;
+                }
+            }
 
             const newTask = {
                 id: taskId,
@@ -2113,16 +2157,22 @@
                 hours: hours,
                 status: 'pending',
                 assignedDate: new Date().toISOString().split('T')[0],
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                attachments: attachments,
+                allowDeptAttachments: allowDeptUploads
             };
 
             // Send to Firestore
             try {
-                await addDoc(collection(db, "tasks"), newTask);
+                // Use setDoc with the pre-generated ID
+                await setDoc(newDocRef, newTask);
 
                 // Clear form
                 document.getElementById('config-title').value = '';
                 document.getElementById('config-description').value = '';
+                fileInput.value = ''; // Clear file input
+                document.getElementById('file-preview-container').innerHTML = ''; // Clear preview
+                document.getElementById('config-allow-dept-uploads').checked = false; // Reset checkbox
 
                 // UI updates happen automatically via onSnapshot listener
 
@@ -2130,6 +2180,9 @@
             } catch (err) {
                 console.error('Error adding task:', err);
                 showNotification('Failed to save task to server', 'error');
+            } finally {
+                addButton.innerHTML = originalText;
+                addButton.disabled = false;
             }
         }
 
@@ -2274,6 +2327,29 @@
                             </div>
                         </div>
                     </div>
+                    
+                    ${task.attachments && task.attachments.length > 0 ? `
+                        <div class="project-attachments" style="margin-bottom: 15px; border-top: 1px solid #eee; padding-top: 15px;">
+                            <h4 style="font-size: 13px; margin-bottom: 10px; color: #7f8c8d; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-paperclip"></i> Attachments</h4>
+                            <div style="display: flex; flex-direction: column; gap: 5px;">
+                                ${task.attachments.map(att => `
+                                    <div class="attachment-item" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px;">
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <i class="fas ${fileUploadManager.getFileIcon(att.type)}" style="color: ${fileUploadManager.getFileIconColor(att.type)}; font-size: 16px;"></i>
+                                            <div style="display: flex; flex-direction: column;">
+                                                <span style="font-size: 13px; font-weight: 500; color: #2c3e50;">${att.name}</span>
+                                                <span style="font-size: 11px; color: #95a5a6;">${fileUploadManager.formatFileSize(att.size || 0)} • Uploaded by ${att.uploadedBy === 'admin' ? 'Admin' : att.uploadedBy}</span>
+                                            </div>
+                                        </div>
+                                        <button onclick="window.downloadAttachment('${att.url}', '${att.name}')" style="background: white; border: 1px solid #dfe6e9; color: #3498db; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
                     <div class="project-actions">
                         ${getActionButtons(task)}
                     </div>
@@ -2772,6 +2848,15 @@
                 showNotification("Error connecting to real-time database", "error");
             });
         }
+
+        // Download attachment wrapper
+        window.downloadAttachment = async (url, filename) => {
+            try {
+                await fileUploadManager.downloadFile(url, filename);
+            } catch (error) {
+                showNotification('Download failed: ' + error.message, 'error');
+            }
+        };
 
         // Make functions globally available for HTML onclick handlers
         window.updateTaskStatus = updateTaskStatus;

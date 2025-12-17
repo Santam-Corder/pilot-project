@@ -432,6 +432,7 @@
 
         // Import Notification Manager
         import { notificationManager } from './js/notifications.js';
+        import { fileUploadManager } from './js/file-upload.js';
 
         // Check session
         const sessionData = sessionStorage.getItem('currentUser');
@@ -538,6 +539,39 @@
                         <span><i class="fas fa-calendar"></i> ${task.deadline}</span>
                         <span><i class="fas fa-clock"></i> ${task.hours}h</span>
                     </div>
+
+                    ${task.attachments && task.attachments.length > 0 ? `
+                        <div class="task-attachments" style="margin: 15px 0; border-top: 1px solid #eee; padding-top: 10px;">
+                            <h4 style="font-size: 13px; color: #7f8c8d; margin-bottom: 8px;"><i class="fas fa-paperclip"></i> Attachments</h4>
+                            <div style="display: flex; flex-direction: column; gap: 5px;">
+                                ${task.attachments.map(att => `
+                                    <div class="attachment-item" style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: #f8f9fa; border: 1px solid #eee; border-radius: 4px;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <i class="fas ${fileUploadManager.getFileIcon(att.type)}" style="color: ${fileUploadManager.getFileIconColor(att.type)}"></i>
+                                            <span style="font-size: 13px;">${att.name.length > 25 ? att.name.substring(0, 22) + '...' : att.name}</span>
+                                            <span style="font-size: 11px; color: #95a5a6;">(${att.uploadedBy === 'admin' ? 'Admin' : 'You'})</span>
+                                        </div>
+                                        <button onclick="window.downloadAttachment('${att.url}', '${att.name}')" style="background: none; border: none; color: #3498db; cursor: pointer;">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${task.allowDeptAttachments && task.status === 'accepted' ? `
+                        <div class="task-upload" style="margin: 15px 0; border-top: 1px solid #eee; padding-top: 10px;">
+                            <h4 style="font-size: 13px; color: #7f8c8d; margin-bottom: 8px;">Upload Response</h4>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="file" id="file-${task.firestoreId}" style="display: none;" onchange="window.handleFileUpload(this, '${task.firestoreId}')">
+                                <button onclick="document.getElementById('file-${task.firestoreId}').click()" style="padding: 6px 12px; background: #ecf0f1; border: 1px solid #bdc3c7; border-radius: 4px; cursor: pointer; font-size: 13px; color: #2c3e50;">
+                                    <i class="fas fa-paperclip"></i> Attach File
+                                </button>
+                                <span id="upload-status-${task.firestoreId}" style="font-size: 12px; color: #7f8c8d;"></span>
+                            </div>
+                        </div>
+                    ` : ''}
                     <span class="task-status status-${task.status}">${task.status.toUpperCase()}</span>
                     <div class="task-actions">
                         ${task.status === 'pending' ? `
@@ -630,6 +664,46 @@
         }
 
         // Expose functions to window
+        // File handlers
+        window.handleFileUpload = async (input, taskId) => {
+            const file = input.files[0];
+            if (!file) return;
+
+            const statusSpan = document.getElementById(`upload-status-${taskId}`);
+            const btn = input.nextElementSibling;
+
+            try {
+                statusSpan.textContent = 'Uploading...';
+                btn.disabled = true;
+
+                await fileUploadManager.uploadFile(file, taskId, 'Landscaping');
+
+                statusSpan.textContent = 'Uploaded!';
+                statusSpan.style.color = '#27ae60';
+
+                // Reset after 3 seconds
+                setTimeout(() => {
+                    statusSpan.textContent = '';
+                    input.value = '';
+                    btn.disabled = false;
+                }, 3000);
+            } catch (error) {
+                console.error('Upload error:', error);
+                statusSpan.textContent = 'Error';
+                statusSpan.style.color = '#e74c3c';
+                alert('Upload failed: ' + error.message);
+                btn.disabled = false;
+            }
+        };
+
+        window.downloadAttachment = async (url, filename) => {
+            try {
+                await fileUploadManager.downloadFile(url, filename);
+            } catch (error) {
+                alert('Download failed: ' + error.message);
+            }
+        };
+
         window.acceptTask = acceptTask;
         window.completeTask = completeTask;
         window.openDeclineModal = openDeclineModal;
