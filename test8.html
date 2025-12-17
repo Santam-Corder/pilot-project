@@ -7,6 +7,7 @@
     <title>Facilities Management Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -1737,6 +1738,11 @@
 
         // Initialize charts
         function initializeCharts() {
+            // Register DataLabels plugin
+            if (typeof ChartDataLabels !== 'undefined') {
+                Chart.register(ChartDataLabels);
+            }
+
             // Pie Chart for Dashboard
             const pieCtx = document.getElementById('pieChart').getContext('2d');
             pieChart = new Chart(pieCtx, {
@@ -1770,6 +1776,28 @@
                                 font: { size: 14 },
                                 padding: 20
                             }
+                        },
+                        // Configure DataLabels plugin
+                        datalabels: {
+                            color: '#fff',
+                            formatter: (value, ctx) => {
+                                let sum = 0;
+                                let dataArr = ctx.chart.data.datasets[0].data;
+                                dataArr.map(data => {
+                                    sum += data;
+                                });
+                                // Avoid division by zero
+                                if (sum === 0) return '';
+
+                                let percentage = (value * 100 / sum).toFixed(0) + "%";
+                                // Show value and percentage if value > 0
+                                return value > 0 ? value + '\n(' + percentage + ')' : '';
+                            },
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            textAlign: 'center'
                         },
                         tooltip: {
                             callbacks: {
